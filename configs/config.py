@@ -16,13 +16,14 @@ class ParaConfig:
     POP_SIZE = [30, ]       # Number of population size in metaheuristics
     N_CPUS_RUN = 16
     N_TRIALS = 15
-    LIST_ALGORITHM_SEEDS = [7, 8, 11, 12, 15, 24, 30, 40, 42, 44, 50, 55, 60, 70, 72]         #  len(LIST_SEEDS) = N_TRIALS
+    # LIST_ALGORITHM_SEEDS = [7, 8, 11, 12, 15, 24, 30, 40, 42, 44, 50, 55, 60, 70, 72]         #  len(LIST_SEEDS) = N_TRIALS
     # LIST_ALGORITHM_SEEDS = [[7]]         #  len(LIST_SEEDS) = N_TRIALS
-    # LIST_ALGORITHM_SEEDS = [[7, 8, 11], 
-    #                         [12, 15, 24],
-    #                         [30, 40, 42],
-    #                         [44, 50, 55], 
-    #                         [60, 70, 72]]         #  len(LIST_SEEDS) = N_TRIALS
+    # the below is for multiprocess running
+    LIST_ALGORITHM_SEEDS = [[7, 8, 11], 
+                            [12, 15, 24],
+                            [30, 40, 42],
+                            [44, 50, 55], 
+                            [60, 70, 72]]         #  len(LIST_SEEDS) = N_TRIALS
     # LIST_ALGORITHM_SEEDS = [[30, 40, 42]]  
     ## Evolutionary-based group
     ep_paras = {

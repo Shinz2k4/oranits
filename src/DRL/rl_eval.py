@@ -11,7 +11,7 @@ import torch
 import sys
 import os
 from rl_env import *
-from configs.systemcfg import log_configs, verbose, DEVICE, ddqn_cfg
+from configs.systemcfg import log_configs, DEVICE, ddqn_cfg
 from configs.config import ParaConfig
 from utils import Load
 import sys
@@ -112,7 +112,6 @@ def create_agent(state_size, action_size, actor_fc1_units=64,
             batch_size=batch_size,
             actor_optimizer=actor_optimizer,
             critic_optimizer=critic_optimizer,
-            verbose = verbose
         )
 
     else:

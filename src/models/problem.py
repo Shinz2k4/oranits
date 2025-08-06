@@ -18,6 +18,9 @@ class ItsProblem(Problem):
         self.data = data
         self.generator = np.random.default_rng(seed)
         super().__init__(bounds, minmax, **kwargs)
+        print(kwargs)
+        if "verbose" not in kwargs:
+            self.verbose = True
 
     # def penalty_func(self, x, penalty_value=10):
     #     total_values = 0
@@ -94,7 +97,7 @@ class ItsProblem(Problem):
         vehcls = []
         for i in range(self.data["n_vehicles"]):
             seg = np.random.choice(self.data["segments"])  # chọn randome 1 con đường rôif nó đặt 1 cái xe cái ô tô vào
-            v = Vehicle(0.5, seg.get_endpoints()[0], self.data["map"], task_cfg['tau'])
+            v = Vehicle(0.5, seg.get_endpoints()[0], self.data["map"], task_cfg['tau'], verbose=self.verbose)
             vehcls.append(v)
             
         # print(sol)
@@ -105,7 +108,7 @@ class ItsProblem(Problem):
                 item.set_observers(vehcls)
         else:
             for item in self.data["decoded_data"]:
-                m = Mission(item['depart_p'], item['depart_s'], 1, graph=self.data["graph"])
+                m = Mission(item['depart_p'], item['depart_s'], 1, graph=self.data["graph"], verbose=self.verbose)
                 m.set_depends(item["depends"])
                 m.set_observers(vehcls)
                 mission.append(m)

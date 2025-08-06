@@ -11,7 +11,7 @@ import torch
 import sys
 import os
 from rl_env import *
-from configs.systemcfg import log_configs, verbose, mission_cfg, map_cfg, ppo_cfg, DEVICE, ddqn_cfg
+from configs.systemcfg import log_configs, mission_cfg, map_cfg, ppo_cfg, DEVICE, ddqn_cfg
 from utils import Load, write_config_not_fromfile
 import torch.optim as optim
 import torch.nn as nn
@@ -113,7 +113,6 @@ def create_agent(state_size, action_size, actor_fc1_units=64,
             batch_size=batch_size,
             actor_optimizer=actor_optimizer,
             critic_optimizer=critic_optimizer,
-            verbose = verbose
         )
 
     else:
@@ -262,104 +261,6 @@ def train_agents_ma(env, trainer, n_episodes=100000, target_score=100000,
             trainer.save()
             break
 
-def ppo():
-    if mission_cfg['n_vehicle'] > 1:
-        raise ValueError("This set up is only for one agents: use mppo instead !!!")
-    load = Load()
-    mission_decoded_data, graph, map =  load.data_load()
-    # Prepare data
-    config = {
-        "n_missions": mission_cfg['n_mission'],
-        "n_vehicles": mission_cfg['n_vehicle'],
-        "n_miss_per_vec": mission_cfg['n_miss_per_vec'],
-        "decoded_data": mission_decoded_data,
-        "segments": map.get_segments(),
-        "graph": graph,
-        "thread": 1,
-        "detach_thread": 0,
-        "score_window_size": 100,
-        "tau": 10*6 #min
-    }
-    register_env("its_env", lambda config: ITSEnv(config, verbose=verbose, map__=map))
-    # Initialize environment, extract state/action dimensions and num agents.
-    env = ITSEnv(config, verbose=verbose, map__=map)
-    num_agents = config['n_vehicles']
-    state_size = np.prod(env.observation_space.shape)
-    action_size = env.action_space.shape[0] 
-    # Initialize agents for training.
-    agents = [create_agent(state_size, action_size, agent_idx=i, load_from_file=False, ckpt_idx=0, ppo = True) for i in range(num_agents)]
-
-    # Create MAPPOTrainer object to train agents.
-    save_dir = os.path.join(os.getcwd(), ppo_cfg['save_dir'])
-    trainer = create_trainer(env = env, agents= agents, 
-                             save_dir = save_dir, 
-                             thread = ppo_cfg['thread'], 
-                             detach_thread=ppo_cfg['detach_thread'],
-                             score_window_size =  ppo_cfg['score_window_size'],
-                             max_eps_length=config['n_miss_per_vec'],
-                             update_frequency=ppo_cfg['update_frequency'],
-                             type_=ppo_cfg['type_']
-                             )
-
-    # Train agent in specified environment.
-    train_agents(env, trainer, score_window_size =  config['score_window_size'])
-
-
-def mppo():
-    load = Load()
-    graph, map_information =  load.get_infor()
-    task_generator = TaskGenerator(1, map_information)
-    config = write_config_not_fromfile(task_generator)
-    register_env("its_env", lambda config: ITSEnv(config, verbose=verbose, map__=map_information, generator=task_generator))
-    # Initialize environment, extract state/action dimensions and num agents.
-    env = ITSEnv(config, verbose=verbose, map__=map_information, generator=task_generator)
-    num_agents = config['n_vehicles']
-    state_size = np.prod(env.observation_space.shape)
-    action_size = env.action_space.shape[0] 
-    # Initialize agents for training.
-    agents = [create_agent(state_size, action_size, agent_idx=i, 
-                           load_from_file=False, ckpt_idx=0, 
-                           ppo = True) for i in range(num_agents)]
-
-    # Create MAPPOTrainer object to train agents.
-    save_dir = os.path.join(os.getcwd(), ppo_cfg['save_dir'])
-    trainer = create_trainer(env = env, agents= agents, 
-                             save_dir = save_dir, 
-                             thread = ppo_cfg['thread'], 
-                             detach_thread=ppo_cfg['detach_thread'],
-                             score_window_size =  ppo_cfg['score_window_size'],
-                             max_eps_length=config['n_miss_per_vec'],
-                             update_frequency=ppo_cfg['update_frequency'],
-                             type_=ppo_cfg['type_']
-                             )
-
-    # Train agent in specified environment.
-    train_agents(env, trainer, score_window_size =  config['score_window_size'])
-
-def ppo_test():
-    env = gym.make('Taxi-v3')
-    # Xác định kích thước trạng thái và hành động
-    state_size = env.observation_space.n  # Số trạng thái rời rạc
-    action_size = env.action_space.n  # Số hành động rời rạc
-
-    # Initialize agent for training
-    agent = create_agent(state_size, action_size, agent_idx=0, load_from_file=False, ckpt_idx=0, ppo=True)
-
-    # Tạo thư mục lưu trữ
-    save_dir = os.path.join(os.getcwd(), 'saved_files/ppo')
-
-    # Tạo đối tượng MAPPOTrainer để đào tạo agent
-    trainer = create_trainer(env, [agent], save_dir, 
-                             thread=1, 
-                             detach_thread=0,
-                             score_window_size=100,
-                             max_eps_length=env.spec.max_episode_steps,
-                             )
-
-    # Đào tạo agent trong môi trường đã chỉ định
-    train_agents(env, trainer, score_window_size=100)
-
-
 def ddqn(**kwargs):
     verbose = kwargs.get('verbose', False)
     load = Load()
@@ -386,158 +287,8 @@ def ddqn(**kwargs):
 
     train_agents(env, trainer, score_window_size = config['score_window_size'])
 
-def ddqn_ma():
-    load = Load()
-    graph, map_information =  load.get_infor()
-    task_generator = TaskGenerator(1, map_information)
-    config = write_config_not_fromfile(task_generator)
-    register_env("its_env", lambda config: ITSEnv(config, verbose=verbose, map__=map_information, generator=task_generator, max_steps=20))
-    # Initialize environment, extract state/action dimensions and num agents.
-    env = ITSEnv(config, verbose=verbose, map__=map_information, generator=task_generator, max_steps=20)
-    num_agents = config['n_vehicles']
-    state_size = np.prod(env.observation_space.shape)
-    action_size = env.action_space.shape[0] 
-    # Initialize agents for training.
-    agents = [create_agent(state_size, action_size, agent_idx=i, load_from_file=False, ckpt_idx=0) for i in range(num_agents)]
-    save_dir = os.path.join(os.getcwd(), r'saved_files_ma_coperate_incr100')
-    trainer = create_trainer(env, agents, save_dir, 
-                             thread = config['thread'], 
-                             detach_thread=config['detach_thread'],
-                             score_window_size =  config['score_window_size'],
-                             max_eps_length=config['n_miss_per_vec'],
-                             type_='DDQNTrainer',
-                             update_frequency=128
-                             )
-
-    train_agents_ma(env, trainer, score_window_size = config['score_window_size'])
 
 
-def A2C():
-    from rl_env import ITSEnv
-    from DRL.DDPPO.actor_critic_its import ActorCritic
-    mission_decoded_data, graph, map =  data_load()
-        # Prepare data
-    config = {
-        "n_missions": mission_cfg['n_mission'],
-        "n_vehicles": mission_cfg['n_vehicle'],
-        "n_miss_per_vec": mission_cfg['n_miss_per_vec'],
-        "decoded_data": mission_decoded_data,
-        "segments": map.get_segments(),
-        "graph": graph,
-        "thread": 1,
-        "detach_thread": 0,
-        "score_window_size": 100,
-        "tau": 10*6 #min
-    }
-    register_env("its_env", lambda config: ITSEnv(config, verbose=verbose, map__=map))
-    # Initialize environment, extract state/action dimensions and num agents.
-    env = SITSEnv(config, verbose=verbose, map__=map)
-    num_agents = config['n_vehicles']
-    state_size = np.prod(env.observation_space.shape)
-    action_size = env.action_space.shape[0] 
-    a2c = ActorCritic(state_size, action_size)
-    
-    epoches = 5000
-    state = env.get_observations()
-    def decode_solution(sol, n_vehicle):
-        import pandas as pd
-        import numpy as np
-
-        # Tạo các khoảng phân loại
-        sol = list(sol.clone().detach().numpy())
-        print(sol)
-        bins = np.linspace(min(sol), max(sol), num=n_vehicle+1)
-
-        # Sử dụng pandas.cut để phân loại
-        labels = list(range(0, n_vehicle+1))
-        return list(pd.cut(sol, bins=bins, labels=labels, include_lowest=True))
-
-    optimizer = optim.Adam(a2c.parameters(), lr=0.0001)
-    mse_loss = nn.MSELoss()
-    all_rewards = []
-    all_losses = []
-    for e in range(epoches):
-        env.reset()
-        state = env.get_observations()
-        
-        done = False
-        log_probs = []
-        values = []
-        rewards = []
-        
-        cnt = 0
-        while not done:
-            state = torch.tensor(state)
-            probs, val = a2c(state.to(dtype=torch.float32))
-            # sol = decode_solution(probs, mission_cfg['n_vehicle'])
-            action_dist = []
-            actions = []
-            logs = []
-            for prob in range(0, len(probs),mission_cfg['n_vehicle']):
-                action_p = torch.distributions.Categorical(probs[prob:prob+mission_cfg['n_vehicle']])
-                action_dist.append(action_p)
-                actions.append(action_p.sample())
-                logs.append(action_p.log_prob(action_p.sample()))
-                
-            actions = torch.tensor(actions)
-            print(actions)
-            logs = torch.tensor(logs)
-            obs, reward, done, truncateds, infos = env.step(actions.detach().numpy())
-            log_probs.append(logs)
-            values.append(val)
-            rewards.append(reward)
-            state = torch.tensor(obs)
-            cnt += 1
-            if cnt >0 and done:
-                Qval = 0
-                Qvals = []
-                for r in reversed(rewards):
-                    Qval = r + 0.95*Qval
-                    # for i in range(30):
-                    Qvals.insert(0, Qval)
-                print(Qvals)
-                Qvals = torch.FloatTensor(Qvals).to(device=device)
-                values = torch.cat(values).to(device=device)
-                log_probs = torch.cat(log_probs).to(device=device)
-                loss = 0
-                for i in range(0, len(values),30):
-                    advantage = (Qvals - sum(values[i:i+30])).to(device=device)
-                    
-                    # advantage = (advantage - advantage.mean()) / (advantage.std() + 1e-8)
-                    
-                    actor_loss = (-(sum(log_probs[i:i+30])) * advantage).mean().to(device=device)
-                    critic_loss = mse_loss(sum(values[i:i+30]), Qvals).to(device=device)
-                    loss += actor_loss + critic_loss
-                optimizer.zero_grad()
-                loss.backward()
-                torch.nn.utils.clip_grad_norm_(a2c.parameters(), max_norm=0.5)
-                optimizer.step()
-                all_rewards.append(sum(rewards))
-                all_losses.append(loss.item())
-                
-                print(f"Episode {e + 1}, Loss: {loss.item():.4f}, Reward: {sum(rewards):.2f}")
-            else:
-                done = False
-                env.reset()
-                state = env.get_observations()
-    
-    plt.figure(figsize=(12, 5))
-    plt.subplot(1, 2, 1)
-    plt.plot(all_rewards)
-    plt.xlabel('Episode')
-    plt.ylabel('Total Reward')
-    plt.title('Reward Over Time')
-
-    plt.subplot(1, 2, 2)
-    plt.plot(all_losses)
-    plt.xlabel('Episode')
-    plt.ylabel('Loss')
-    plt.title('Loss Over Time')
-
-    # plt.tight_layout()
-    plt.savefig("ac2.png", dpi = 300)
-    plt.show()
-    plt.close()
 if __name__ == '__main__':
     # ddqn()
     mppo()

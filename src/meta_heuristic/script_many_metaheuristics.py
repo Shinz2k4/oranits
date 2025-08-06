@@ -41,12 +41,12 @@ def run_trials(algorithm, problem, mha_paras, n_trials, list_algorithm_seeds, pa
     return results
 
 
-def develop_model(algorithm):
+def develop_model(algorithm, verbose):
     print(f"Start running: {algorithm['name']}")
 
     data, graph, map_ = write_config()
     data["map"] = map_
-
+    print(f"verbose is {verbose}")
     mission = []
     for item in data["decoded_data"]:
         m = Mission(item['depart_p'], item['depart_s'], 1, graph=data["graph"])
@@ -61,14 +61,14 @@ def develop_model(algorithm):
                    ub=(data["n_vehicles"]-1, )*n_dim_vecs,
                    name="vehicle_idx"),
     ]
-    problem = ItsProblem(bounds=bounds, minmax="max", data=data, log_to="console", obj_weights=(1.0, 0., 0.), seed=ParaConfig.SEED_GLOBAL)
-
+    problem = ItsProblem(bounds=bounds, minmax="max", data=data, log_to="console", obj_weights=(1.0, 0., 0.), seed=ParaConfig.SEED_GLOBAL, verbose=verbose)
     for paras_temp in list(ParameterGrid(algorithm["param_grid"])):
         mha_paras = dict((key, paras_temp[key]) for key in algorithm["param_grid"].keys())
         cnt = 0
         for group in ParaConfig.LIST_ALGORITHM_SEEDS:
             run_trials(algorithm, problem, mha_paras, len(group), group, ParaConfig.PATH_SAVE, start = cnt)
             cnt += len(group)
+        
         # for trial in range(0, ParaConfig.N_TRIALS):
         #     model = dict_optimizer_classes[algorithm["name"]](**mha_paras)
         #     model.solve(problem, seed=ParaConfig.LIST_ALGORITHM_SEEDS[trial])
@@ -87,7 +87,7 @@ def eval_model(algorithm, data, cnt = 0):
                    ub=(data["n_vehicles"]-1, )*n_dim_vecs,
                    name="vehicle_idx"),
     ]
-    problem = ItsProblem(bounds=bounds, minmax="max", data=data, log_to="console", obj_weights=(1.0, 0., 0.), seed=ParaConfig.SEED_GLOBAL)
+    problem = ItsProblem(bounds=bounds, minmax="max", data=data, log_to="console", obj_weights=(1.0, 0., 0.), seed=ParaConfig.SEED_GLOBAL, verbose=verbose)
     for paras_temp in list(ParameterGrid(algorithm["param_grid"])):
         mha_paras = dict((key, paras_temp[key]) for key in algorithm["param_grid"].keys())
         save_dir = f"{ParaConfig.EVAL_PATH_SAVE}/-data-{cnt}"
@@ -120,7 +120,9 @@ def many_metaheuristics(**kwargs):
     generate(mission_f_name="mission_information_metaheu.json")
     # develop_model(ParaConfig.models[0])
     with parallel.ProcessPoolExecutor(ParaConfig.N_CPUS_RUN) as executor:
-        results = executor.map(develop_model, ParaConfig.models)
+        model_list = ParaConfig.models
+        verbose_list = [verbose] * len(model_list)
+        results = executor.map(develop_model, model_list, verbose_list)
     print(f"MHA-ITS Problem DONE: {time.perf_counter() - time_start} seconds")
 
 

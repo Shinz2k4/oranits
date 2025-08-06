@@ -79,6 +79,7 @@ def write_config(file_read = "mission_information.json", graph=None, from_file =
         "score_window_size": score_window_size,
         "tau": tau #min
     }
+    print("Finish load data from file")
     return config, graph, map
 
 def write_config_not_fromfile(generator_obj):

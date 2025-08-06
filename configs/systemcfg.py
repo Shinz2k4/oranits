@@ -67,7 +67,6 @@ network_cfg = {
     "best_rate_radius": 100, #m
     "seed":42 
 }
-verbose = 0
 eval = False
 ddqn_cfg = {
     "discount_factor":0.95,
