@@ -196,8 +196,9 @@ def eval_agents(env, trainer, n_episodes=100000, target_score=100000,
             trainer.print_status()
             trainer.plot()
 
-def eval_ddqn(num = 20):
+def eval_ddqn(num = 20, **kwargs):
     load = Load()
+    verbose = kwargs.get('verbose', False)
     graph, map_information =  load.get_infor()
     task_generator = TaskGenerator(1, map_information)
     config = write_config_not_fromfile(task_generator)

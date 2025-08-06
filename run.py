@@ -5,8 +5,7 @@ matplotlib.rcParams['font.size']=11
 plt.style.use(["science", "ieee"])
 from src import *
 import argparse
-from src.DRL.rl_run import ddqn, ddqn_ma, A2C, ppo, ppo_test, mppo
-from src.DRL.run_ddqn import run_single_agent_ddqn
+from src.DRL.rl_run import ddqn
 from src.DRL.rl_eval import eval_ddqn
 from src.meta_heuristic.script_many_metaheuristics import many_metaheuristics
 from src.meta_heuristic.script_statistic import get_statistic_results
@@ -64,7 +63,7 @@ def main():
     if args.input == 'None':
         print("No function is selected")
     else:
-        getattr(current_module, args.input)()
+        getattr(current_module, args.input)(**vars(args))
         
     if args.analysis == 0:
         get_statistic_results()

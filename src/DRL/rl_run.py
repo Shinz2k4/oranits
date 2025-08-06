@@ -360,7 +360,8 @@ def ppo_test():
     train_agents(env, trainer, score_window_size=100)
 
 
-def ddqn():
+def ddqn(**kwargs):
+    verbose = kwargs.get('verbose', False)
     load = Load()
     graph, map_information =  load.get_infor()
     task_generator = TaskGenerator(1, map_information)

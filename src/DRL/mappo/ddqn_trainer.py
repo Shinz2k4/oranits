@@ -149,7 +149,7 @@ class DDQNTrainer:
                 action, log_prob = agent.get_actions(processed_state, idx)
                 if any(torch.equal(processed_state, item) for item in processed_states) \
                     and int(np.argmax(action[1])) in actionssss:
-                    print("----------> gioonsg nhau")
+                    continue
                 actionssss.append(int(np.argmax(action[1])))
                 processed_states.append(processed_state)
                 log_probs.append(log_prob)
@@ -308,7 +308,7 @@ class DDQNTrainer:
                 action, log_prob = agent.get_actions(processed_state, idx)
                 if any(torch.equal(processed_state, item) for item in processed_states) \
                     and int(np.argmax(action[1])) in actionssss:
-                    print("----------> gioonsg nhau")
+                    continue
                 actionssss.append(int(np.argmax(action[1])))
                 processed_states.append(processed_state)
                 log_probs.append(log_prob)
@@ -450,7 +450,6 @@ class DDQNTrainer:
                 reduce = 0
             for i in range(len(cur_memory[0])):
                 if cur_memory[2][i] == 0 and cur_memory[4][i]!=-1:
-                    # print("cur_memory[2][i]------->",idx, reward + cur_memory[2][i]-cur_memory[4][i]*reduce,reduce, cur_memory[4][i], cur_memory[2][i])
                     self.agents[idx].add_memory(cur_memory[0][i],cur_memory[1][i], reward + cur_memory[2][i]-cur_memory[4][i]*reduce, cur_memory[3][i])
                 else:
                     self.agents[idx].add_memory(cur_memory[0][i],cur_memory[1][i], cur_memory[2][i],cur_memory[3][i])

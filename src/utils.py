@@ -27,6 +27,7 @@ def decode_mission(obj):
 class Load:
     map = Map(map_cfg['n_lines'], busy=map_cfg['busy'], fromfile=map_cfg['fromfile'])
     def __init__(self, file_load = 'mission_information.json', graph = None):
+        print("Load map and mission from file")
         self.map = Load.map
         #inital map from file
         self.map.draw_segments()

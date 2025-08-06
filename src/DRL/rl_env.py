@@ -77,7 +77,8 @@ class ITSEnv(gym.Env):
         import time
         start = time.perf_counter()        
         if (self.done and rfile and not eval) or predict:
-            print("---------> reset", self.done)
+            if self.verbose:
+                print("---------> reset", self.done)
             self.data = write_config_not_fromfile(self.tg)
             self.current_step = 0
             
@@ -106,7 +107,8 @@ class ITSEnv(gym.Env):
         start = time.perf_counter()
         
         if (rfile ) or predict:
-            print("---------> reset", self.done)
+            if self.verbose:
+                print("---------> reset", self.done)
             self.data = write_config_not_fromfile(self.tg)
             self.current_step = 0
             

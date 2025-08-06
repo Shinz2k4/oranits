@@ -113,7 +113,8 @@ def dual_eval(algorithm, data, cnt = 0):
         results = executor.map(eval_model, algorithm, data_m, cnt_m)
     print(f"MHA-ITS Problem DONE: {time.perf_counter() - time_start} seconds")
 
-def many_metaheuristics():
+def many_metaheuristics(**kwargs):
+    verbose = kwargs.get('verbose', False)
     time_start = time.perf_counter()
     print(f"MHA-ITS Problem Start!!!")
     generate(mission_f_name="mission_information_metaheu.json")
