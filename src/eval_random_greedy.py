@@ -108,11 +108,12 @@ def random_distribution():
     load = Load()
     graph, map_information =  load.get_infor()
     task_generator = TaskGenerator(1, map_information)
-    num_trails = 10
+    num_trails = 100
     original_stdout = sys.stdout
     with open(f"{ParaConfig.EVAL_PATH_SAVE}/random_result_.txt", "w") as file:
         sys.stdout = file
         for i in range(num_trails):
+            print(i) 
             config= write_config_not_fromfile(task_generator)
             # print(config)
             action =get_random_solution(config['n_vehicles'], config['n_missions'])
@@ -123,11 +124,12 @@ def greedy_distance():
     load = Load()
     graph, map_information =  load.get_infor()
     task_generator = TaskGenerator(1, map_information)
-    num_trails = 10
+    num_trails = 100
     original_stdout = sys.stdout
     with open(f"{ParaConfig.EVAL_PATH_SAVE}/greedy_distance_result_.txt", "w") as file:
         sys.stdout = file
         for i in range(num_trails):
+            print(i)
             config= write_config_not_fromfile(task_generator)
             # print(config)
             action, vehcls =get_greedy_distance_solution(config)

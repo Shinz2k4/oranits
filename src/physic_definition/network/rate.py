@@ -10,6 +10,19 @@ import sys
 
 max_ = sys.maxsize
 def random_bs_num(interection):
+    """
+    Generate a list of tuples representing the positions and CPU frequencies of MECs (Mobile Edge Computing servers).
+    Args:
+        interection (list): A list of positions where MECs can be placed.
+    Returns:
+        list: A list of tuples, where each tuple contains a position and a CPU frequency for a MEC.
+    Raises:
+        ValueError: If the provided `interection` list is empty.
+    Notes:
+        - The function uses a random generator `rd_generator` to select positions and CPU frequencies.
+        - The number of MECs (`n_MEC`) and the range of CPU frequencies (`CPU_freq`) are defined in the `network_cfg` configuration.
+    """
+    
     if len(interection) == 0:
         raise ValueError ("Map is not build")
     position_of_mec = rd_generator.choice(interection, network_cfg['n_MEC'])
@@ -17,6 +30,23 @@ def random_bs_num(interection):
     return list(zip(position_of_mec, cpu_freq_of_mec))
 
 def chann_rates(distance):
+    """
+    Calculate the channel rate based on the given distance.
+    Parameters:
+    distance (float): The distance between the transmitter and receiver.
+    Returns:
+    float: The calculated channel rate.
+    Notes:
+    - The function uses a random generator to create a complex channel gain `h`.
+    - The transmit power `Pt` is set to 199.526 mW.
+    - The noise power spectral density `No` is set to 3.98e-21.
+    - The number of channels `m` is set to 10.
+    - The total bandwidth `bandwidth` is set to 20 MHz.
+    - The path loss exponent `path_loss` is set to 3.
+    - The channel gain `h` is normalized and adjusted based on the distance and path loss.
+    - The rate is calculated using the Shannon-Hartley theorem.
+    """
+    
     rate=0
     # h=complex(rd_generator.standard_normal(size=(5,1)),rd_generator.standard_normal(size=(5,1)))
     h = rd_generator.standard_normal(size=(16,)) + 1j * rd_generator.standard_normal(size=(16,))

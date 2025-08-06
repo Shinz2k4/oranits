@@ -5,11 +5,6 @@ sys.path.append(parent_dir)
 sys.path.append(os.path.dirname(parent_dir))
 
 from mappo.ddqn_trainer import DDQNTrainer
-from mappo.mappo_trainer import MAPPOTrainer
-from mappo.ppo_model import PolicyNormal
-from mappo.ppo_model import CriticNet
-from mappo.ppo_model import ActorNet
-from mappo.ppo_agent import PPOAgent
 from mappo.ddqn_agent import DDQNAgent
 import numpy as np
 import torch

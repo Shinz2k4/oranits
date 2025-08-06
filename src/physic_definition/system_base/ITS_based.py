@@ -38,15 +38,7 @@ class Subject(metaclass=abc.ABCMeta):
     
 
 class Mission(Subject):
-    '''
-        this is definition for Mission
-        For a mission we would like to know:
-        1. the departure.
-        2. The destination.
-        3. which time slot that the mission belong to.
-        4. How long for the mission should be handled.
-        5. the status of the mission: done, inprocess, created.
-    '''
+    """A class to represent a mission in the ITS-based system."""    
     missionID = 0
     status = ["created", "inprocess", "done"]
     def __init__(self, dpart, desti, tslot, graph, verbose=False):
@@ -164,6 +156,21 @@ class Mission(Subject):
         return self.__depend_l
     
     def update_status(self, value, missions = None, time = 0):
+        """
+        Updates the status of the mission and notifies dependent missions and observers.
+        Args:
+            value (int): The new status value to be set for the mission.
+            missions (list, optional): A list of Mission objects that depend on this mission. Defaults to None.
+            time (int, optional): The current time to be used for notifying observers. Defaults to 0.
+        Returns:
+            int: The number of dependencies removed and observers notified.
+        Example:
+            mission = Mission()
+            dependent_mission = Mission()
+            mission.update_status(1, [dependent_mission], 10)
+        """
+       
+        
         self.__status = value
         n_remove_depends = 0
         if Mission.status[value] == "done" and missions!=None:
@@ -198,6 +205,13 @@ class Mission(Subject):
         return self.__tslot
     
 class Vehicle(Observer):
+    """
+    A class to represent a vehicle in the ITS-based system.
+    The class manages the vehicle's position, missions, and interactions with the map.
+    It allows setting missions, processing them, and updating the vehicle's state based on the missions' status.
+    It also provides methods to accept missions, check readiness, and process tasks.
+    """
+    
     id = 0
     def __init__(self, cpu_freqz, cur_pos, map, tau = 120, verbose=False, sts = 0, non_priority_orders=False):
         #sts: là giá trị thể hiện rằng liệu phương tiện có chọn task by task ko
@@ -235,6 +249,22 @@ class Vehicle(Observer):
         Vehicle.id = 0
     
     def set_mission(self, sol, missions=[], mtuple = False):
+        """
+        Sets the mission for the vehicle based on the provided solution and missions.
+        Parameters:
+        sol (list, np.ndarray, int, np.int64): The solution which can be a list, numpy array, or an integer.
+        missions (list): A list of mission objects.
+        mtuple (bool): A flag indicating if the solution is a tuple containing order and vehicle information.
+        Returns:
+        bool: Returns True if there are ready missions, False otherwise.
+        Raises:
+        ValueError: If the input solution type is incorrect.
+        Notes:
+        - If `sol` is a list or numpy array and `mtuple` is False, it iterates through the solution to find the vehicle ID and sets the mission.
+        - If `sol` is an integer or numpy int64, it directly sets the mission based on the index.
+        - If `sol` is a list or numpy array and `mtuple` is True, it processes the solution as a tuple containing order and vehicle information.
+        - The method updates the mission status and verifies readiness based on the mission dependencies and priority orders.
+        """
         if self.__intime ==False:
             return
         if (isinstance(sol, list) or isinstance(sol, np.ndarray)) and not mtuple:
@@ -287,6 +317,17 @@ class Vehicle(Observer):
             raise ValueError("wrong inputs")
             
     def fit_order(self):
+        """
+        Sorts and processes orders and missions based on their status.
+        This method first sorts the orders by their second element. It then iterates through the sorted orders and 
+        matches them with missions. If a mission's status is 1 and it is ready, the mission is moved to the ready 
+        missions list and removed from the missions and acceptance missions lists. If the mission is not ready, 
+        it is added to the acceptance list. Finally, the missions and acceptance missions lists are updated with 
+        the accepted missions.
+        Returns:
+            None
+        """
+        
         if len(self.__order) ==0:
             return
         self.__order.sort(key = lambda x:x[1])
@@ -306,7 +347,18 @@ class Vehicle(Observer):
         self.__acceptance_mis = accept.copy()
             
     def accept_mission(self, miss, order = None):
-            
+        """
+        Accepts a mission and optionally assigns an order to it.
+        This method registers the current object as an observer of the mission,
+        appends the mission to the list of missions, and optionally appends the 
+        mission and its order to the list of orders.
+        Args:
+            miss (Mission): The mission to be accepted.
+            order (Optional[Any]): The order associated with the mission. Defaults to None.
+        Returns:
+            None
+        """
+        
         if order != None:
             self.__order.append((miss.get_mid(), order)) 
         miss.register_observer(self)
@@ -317,6 +369,14 @@ class Vehicle(Observer):
         return self.__ctrl_time
     
     def update(self, mission, time = 0):
+        """
+        Update the system state based on the given mission and time.
+        Args:
+            mission: The mission object that contains the details of the mission to be updated.
+            time (int, optional): The current time. Defaults to 0.
+        Returns:
+            int: The number of dependencies removed after checking readiness.
+        """
         
         is_depends = False
         if len(self.__ready_mis)==0 :
@@ -327,6 +387,18 @@ class Vehicle(Observer):
             self.__ctrl_time = time
         return n_remove_depends
     def check_ready(self, mission):
+        """
+        Check and update the readiness of missions based on dependencies.
+        This method checks the current list of missions and updates their status 
+        based on the dependencies of the given mission. If a mission has no more 
+        dependencies, its status is updated to ready. The method also handles 
+        the removal of dependencies and updates the list of ready missions.
+        Args:
+            mission: The mission object whose dependencies are to be checked.
+        Returns:
+            int: The number of dependencies removed.
+        """
+        
         if len(self.__missions) == 0:
             return 0
         id = mission.get_mid()
@@ -818,5 +890,6 @@ def generate(mission_f_name = "mission_information.json"):
     tg.gen_tasks()
     tg.gen_mission(mission_cfg['n_mission'], file = mission_f_name)
 if __name__ == "__main__":
+    
     generate()
     

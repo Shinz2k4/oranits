@@ -8,7 +8,7 @@ import os, sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '../..')) 
 sys.path.append(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..')) 
-from src.physic_definition.system_base.ITS_based import Task, generate
+from src.physic_definition.system_base.ITS_based import Task, generate, Mission
 from src.physic_definition.map.decas import *
 from src.physic_definition.map.graph import *
 from configs.systemcfg import map_cfg, mission_cfg
@@ -23,7 +23,7 @@ import concurrent.futures as parallel
 import time
 from src.utils import Load, write_config
 import multiprocessing
-
+import copy
 def run_trial(trial, algorithm, problem, mha_paras, seed, path_save):
 
     model = dict_optimizer_classes[algorithm["name"]](**mha_paras)
@@ -47,6 +47,13 @@ def develop_model(algorithm):
     data, graph, map_ = write_config()
     data["map"] = map_
 
+    mission = []
+    for item in data["decoded_data"]:
+        m = Mission(item['depart_p'], item['depart_s'], 1, graph=data["graph"])
+        m.set_depends(item["depends"])
+        mission.append(m)
+    data['decoded_data'] = False
+    data['missions'] = mission
     n_dim_vecs = data["n_vehicles"]*data["n_miss_per_vec"]
     bounds = [
         PermutationVar(valid_set=tuple(range(0, data["n_missions"])), name="mission_idx"),
@@ -68,12 +75,11 @@ def develop_model(algorithm):
         #     draw_model_figure(model, path_save=f"{ParaConfig.PATH_SAVE}/trial-{trial}/{algorithm['name']}")
 
 
-def eval_model(algorithm, map_, data, cnt = 0):
+def eval_model(algorithm, data, cnt = 0):
+    
     print(f"Start running: {algorithm['name']}")
 
     # data, graph, map_ = write_config()
-    data["map"] = map_
-
     n_dim_vecs = data["n_vehicles"]*data["n_miss_per_vec"]
     bounds = [
         PermutationVar(valid_set=tuple(range(0, data["n_missions"])), name="mission_idx"),
@@ -82,19 +88,30 @@ def eval_model(algorithm, map_, data, cnt = 0):
                    name="vehicle_idx"),
     ]
     problem = ItsProblem(bounds=bounds, minmax="max", data=data, log_to="console", obj_weights=(1.0, 0., 0.), seed=ParaConfig.SEED_GLOBAL)
-
     for paras_temp in list(ParameterGrid(algorithm["param_grid"])):
         mha_paras = dict((key, paras_temp[key]) for key in algorithm["param_grid"].keys())
-        save_dir = f"{ParaConfig.PATH_SAVE}/-data-{cnt}"
-        cnt = 0
+        save_dir = f"{ParaConfig.EVAL_PATH_SAVE}/-data-{cnt}"
+        cnt_ = 0
         flat_vector = np.array(ParaConfig.LIST_ALGORITHM_SEEDS).reshape(1, -1)
         for group in flat_vector:
-            run_trials(algorithm, problem, mha_paras, len(group), group, save_dir, start = cnt)
-            cnt += len(group)
+            run_trials(algorithm, problem, mha_paras, len(group), group, save_dir, start = cnt_)
+            cnt_ += len(group)
         # for trial in range(0, ParaConfig.N_TRIALS):
         #     model = dict_optimizer_classes[algorithm["name"]](**mha_paras)
         #     model.solve(problem, seed=ParaConfig.LIST_ALGORITHM_SEEDS[trial])
         #     draw_model_figure(model, path_save=f"{ParaConfig.PATH_SAVE}/trial-{trial}/{algorithm['name']}")
+
+def dual_eval(algorithm, data, cnt = 0):
+    time_start = time.perf_counter()
+    # eval_model(algorithm[0], data, cnt)
+    data_m = []
+    cnt_m = []
+    for i in range(len(algorithm)):
+        data_m.append(copy.deepcopy(data))
+        cnt_m.append(cnt)
+    with parallel.ProcessPoolExecutor(ParaConfig.N_CPUS_RUN) as executor:
+        results = executor.map(eval_model, algorithm, data_m, cnt_m)
+    print(f"MHA-ITS Problem DONE: {time.perf_counter() - time_start} seconds")
 
 def many_metaheuristics():
     time_start = time.perf_counter()

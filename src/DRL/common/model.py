@@ -2,6 +2,8 @@ import torch as th
 from torch import nn
 import sys
 from configs.systemcfg import DEVICE
+# from configs.systemcfg import DEVICE
+
 device = th.device('cuda:'+str(DEVICE) if th.cuda.is_available() else 'cpu')
 if device == "cpu":
     print("cannot train with cpu")
@@ -84,7 +86,7 @@ class ActorCriticNetwork(nn.Module):
         self.actor_linear = nn.Linear(hidden_size, action_dim)
         self.critic_linear = nn.Linear(hidden_size, critic_output_size)
         self.actor_output_act = actor_output_act
-        self.device = th.device("cuda" if th.cuda.is_available() else "cpu")
+        self.device = device
         self.to(self.device)
 
     def forward(self, state):

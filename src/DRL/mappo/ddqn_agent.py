@@ -9,15 +9,17 @@ import numpy as np
 import time
 from threading import Lock, active_count
 from configs.systemcfg import DEVICE, GLOBAL_SEED
+
+
 device = torch.device('cuda:'+str(DEVICE) if torch.cuda.is_available() else 'cpu')
-if device == "cpu":
+if device == 'cpu':
     print("cannot train with cpu")
     exit(0)
 else:
     print("cuda: ", device)
 
     
-from configs.systemcfg import ddqn_cfg
+from configs.systemcfg import ddqn_cfg, eval
 class DDQNAgent(nn.Module):
     global_memory = deque(maxlen=ddqn_cfg['maxlen_mem'])
     
@@ -60,8 +62,6 @@ class DDQNAgent(nn.Module):
         layer_size_1 = self.state_size + int(self.state_size*0.3)
         layer_size_2 = int(self.state_size*0.6)        
         layer_size_3 = int(self.state_size*0.2)
-
-
         model = nn.Sequential(
             nn.Linear(self.state_size, layer_size_1),
             nn.SELU(),
@@ -122,6 +122,8 @@ class DDQNAgent(nn.Module):
         self.global_memory.append((state, action, reward, next_state, done))
         
     def train_model(self):
+        if eval:
+            return
         if self.epsilon > self.epsilon_min:
             self.epsilon *= self.epsilon_decay
             print(f"self.learning_rate {self.learning_rate}")

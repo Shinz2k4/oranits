@@ -8,7 +8,7 @@
 class ParaConfig:
 
     PATH_SAVE = "results"
-    EVAL_PATH_SAVE = "evavalueate_results"
+    EVAL_PATH_SAVE = "evavalueate_results_20_trials"
     # PATH_SAVE = "results_ARO"
 
     SEED_GLOBAL = 42
@@ -16,13 +16,14 @@ class ParaConfig:
     POP_SIZE = [30, ]       # Number of population size in metaheuristics
     N_CPUS_RUN = 16
     N_TRIALS = 15
-    # LIST_ALGORITHM_SEEDS = [7, 8, 11, 12, 15, 24, 30, 40, 42, 44]         #  len(LIST_SEEDS) = N_TRIALS
-    LIST_ALGORITHM_SEEDS = [[7, 8, 11], 
-                            [12, 15, 24],
-                            [30, 40, 42],
-                            [44, 50, 55], 
-                            [60, 70, 72]]         #  len(LIST_SEEDS) = N_TRIALS
-
+    LIST_ALGORITHM_SEEDS = [7, 8, 11, 12, 15, 24, 30, 40, 42, 44, 50, 55, 60, 70, 72]         #  len(LIST_SEEDS) = N_TRIALS
+    # LIST_ALGORITHM_SEEDS = [[7]]         #  len(LIST_SEEDS) = N_TRIALS
+    # LIST_ALGORITHM_SEEDS = [[7, 8, 11], 
+    #                         [12, 15, 24],
+    #                         [30, 40, 42],
+    #                         [44, 50, 55], 
+    #                         [60, 70, 72]]         #  len(LIST_SEEDS) = N_TRIALS
+    # LIST_ALGORITHM_SEEDS = [[30, 40, 42]]  
     ## Evolutionary-based group
     ep_paras = {
         "epoch": EPOCH, "pop_size": POP_SIZE,
@@ -947,6 +948,9 @@ class ParaConfig:
     # ]
 
     models = [
+        # The above code snippet appears to be defining a dictionary in Python that contains
+        # information about different optimization algorithms. Each dictionary entry includes the name
+        # of the algorithm, its class name, and a parameter grid associated with it.
         # {"name": "CGG-ARO-02", "class": "CggAro02Its", "param_grid": cgg_aro_02_paras},  # Chaotic Gaussian-based Global Artificial Rabbits Optimization (CGG-ARO)
         # {"name": "CGG-ARO-03", "class": "CggAro03Its", "param_grid": cgg_aro_03_paras},  # Chaotic Gaussian-based Global Artificial Rabbits Optimization (CGG-ARO)
 

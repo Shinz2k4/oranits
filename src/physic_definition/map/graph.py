@@ -38,7 +38,7 @@ class Graph:
         vertexes = self.__ngr.keys()
         dijkstra_ = {}
         for ver in  vertexes:
-            dijkstra_[ver] = (float('inf'), "n")
+            dijkstra_[ver] = (float('inf'), "n") #khoảng cách bao xa, và đường đi là gì
         dijkstra_[pnt1] = (0, pnt1)
         queue = [pnt1]
 

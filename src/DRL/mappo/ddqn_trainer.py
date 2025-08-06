@@ -500,6 +500,8 @@ class DDQNTrainer:
             scores = self.run_episode_modify_reward()
         else:
             scores = self.run_episode()
+            print("Not run episode with modify reward")
+            
         
         # Sum the episode rewards for each agent to get the total rewards.
         score_by_agent = np.sum(scores, axis=1)
@@ -564,40 +566,44 @@ class DDQNTrainer:
     def plot(self):
         """
         Plots moving averages of maximum reward and rewards for each agent.
+        Avoids using colors that blend with the background (e.g., white).
         """
+        
 
-        # Initialize DataFrame to be used for plot.
+        # Initialize DataFrame
         columns = [f'Agent {i}' for i in range(len(self.agents))]
         df = pd.DataFrame(self.score_history, columns=columns)
         df['Max'] = df.max(axis=1)
 
-        # Plot rewards per agent and cumulative moving averages.
+        # Setup figure and axis
         fig, ax = plt.subplots(figsize=(12, 9))
-        ax.set_title(
-            f'Learning Curve: Multi-Agent DDQN',
-            fontsize=28
-        )
+        ax.set_title('Learning Curve: Multi-Agent DDQN', fontsize=28)
         ax.set_xlabel('Episode', fontsize=21)
         ax.set_ylabel('Score', fontsize=21)
 
-        # Plot moving averages for agents.
-        df.rolling(self.score_window_size).mean().iloc[:, :-1]\
-            .plot(ax=ax, colormap='terrain', legend=True)
-
-        # Plot the Max line separately with a distinct color (e.g., red).
-        df['Max'].rolling(self.score_window_size).mean().plot(
-            ax=ax, color='red', linewidth=2, label='Max Reward'
+        # Use a colormap that avoids white (tab10 is a good default for up to 10 agents)
+        df.rolling(self.score_window_size).mean().iloc[:, :-1].plot(
+            ax=ax,
+            colormap='tab10',
+            legend=True
         )
 
-        ax.grid(color='w', linewidth=0.2)
+        # Plot max line in red
+        df['Max'].rolling(self.score_window_size).mean().plot(
+            ax=ax,
+            color='red',
+            linewidth=2,
+            label='Max Reward'
+        )
+
+        # Grid, legend, and layout
+        ax.grid(color='gray', linewidth=0.2)
         ax.legend(fontsize=13)
         plt.tight_layout()
 
-        # Save resulting plot.
-        # filename = f'scores_{self.i_episode}.png'
+        # Save plot and data
         filename = f'scores.png'
         fig.savefig(os.path.join(self.save_dir, filename))
         df.to_csv(os.path.join(self.save_dir, "_reward.csv"))
 
         plt.close()
-        # plt.show()

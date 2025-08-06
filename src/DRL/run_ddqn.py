@@ -62,7 +62,7 @@ os.makedirs(checkpoint_dir, exist_ok=True)
 shutil.copy(current_file, output_dir)
 
 
-def run():
+def run_single_agent_ddqn():
     load = Load()
     mission_decoded_data, graph, map =  load.data_load()
     # Prepare data
@@ -135,6 +135,6 @@ def run():
     # dqn.save_model(f"{output_dir}/real_map_dqn_model.pth")
 if __name__ == "__main__":
     if len(sys.argv) >= 2:
-        run(sys.argv[1])
+        run_single_agent_ddqn(sys.argv[1])
     else:
-        run()
+        run_single_agent_ddqn()

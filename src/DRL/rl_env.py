@@ -537,7 +537,7 @@ class SITSEnv(gym.Env): #single agent env
         self._agent_ids = set()
         self.action_space = Box(-np.inf, np.inf, shape=(data["n_missions"],), dtype='float32')
         
-        self.observation_space = Box(-np.inf, np.inf, shape=(634,1), dtype="float32")                    
+        self.observation_space = Box(-np.inf, np.inf, shape=(1077,1), dtype="float32")                    
         self.action_memory = [0]*data["n_missions"]
         self.solution =  ['None']*(mission_cfg['n_vehicle']*mission_cfg['n_miss_per_vec'])
         self.tg = TaskGenerator(15,self.lmap)

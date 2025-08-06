@@ -4,17 +4,29 @@ from configs.systemcfg import *
 from .onx_map import *
 import time
 class Road:
-    '''
-        this is definition for Road
-        For a road we would like to know:
-        1. road condition = ["fast", "normal", "slow", "stuck"]
-            1/fast: no any problem: 50 Km/h, offloading task rate: 20 task/s
-            2/normal: 1-2 yellow segment: 40 km/h, offloading task rate: 30 task/s
-            3/Slow: all road is yellow: vehicle can moving with slow speed : 30 km/h, offloading task rate: 50 task/s
-            4/stuck: there are many red segments: vehicle can run with a very slow speed: 10 km/h, offloading task rate: 100 task/s
-        3. road simulation line
-        2. list of intersection
-    '''
+    """
+        A class to represent a road in a map.
+        Attributes
+        ----------
+        roadID : int
+            A unique identifier for the road.
+        rlong : list
+            A list containing the minimum and maximum length of the road in kilometers.
+        __rid : int
+            The unique identifier for the road instance.
+        __rinter : list
+            A list of intersections associated with the road.
+        generator : numpy.random.Generator
+            A random number generator for generating random values.
+        __rlong : int
+            The length of the road in kilometers.
+        __line : Line
+            The line object representing the road.
+        __state : int
+            The current state of the road (e.g., normal, busy, etc.).
+        __segments : list
+            A list of segments that make up the road.
+    """
     roadID = 0
     rlong = [1,5] #km
     def __init__(self, line, status = 0):
@@ -65,6 +77,26 @@ class Road:
         return self.__line.intersection_point(rd.get_line(), max_v, max_h)
     
     def find_segments(self):
+        """
+        Divides the road into smaller segments based on the current state and 
+        calculates the average speed and task rate for each segment.
+        The method performs the following steps:
+        1. Sorts the road intersections.
+        2. Iterates through the sorted intersections to create segments.
+        3. Depending on the current state, assigns different average speeds, 
+           task rates, and statuses to each segment.
+        4. Appends the created segments to the segments list.
+        5. Calculates the mean task rate and average speed for all segments.
+        Attributes:
+            __rinter (list): List of road intersections.
+            __state (int): Current state of the road.
+            generator (object): Random generator for selecting statuses.
+            __line (object): Line object representing the road.
+            __segments (list): List to store the created segments.
+            __t_r (float): Mean task rate for all segments.
+            __avg_speed (float): Mean average speed for all segments.
+        """
+        
         #divide the road into smaller segments
         rinter = sorted(self.__rinter.copy())
         t_rs = []
@@ -120,11 +152,61 @@ class Road:
 
 
 class Map:
-    '''
-        in this map the distance btw two road about: 0.5 -> 1km
-        the angle ~ 0-> 10 degree
+    """
+    Represents a city map with roads, intersections, and segments, supporting both synthetic and real map generation.
+    Attributes:
+        busy_ps (list): Probability distributions for different traffic states.
+        busy_status (list): List of traffic state identifiers.
+        __rnum (int): Total number of roads in the map.
+        __vrnum (int): Number of vertical roads.
+        __hrnum (int): Number of horizontal roads.
+        __busy (int): Current traffic state of the map.
+        __max_v (int): Maximum vertical coordinate (map height).
+        __max_h (int): Maximum horizontal coordinate (map width).
+        __intersec (dict): Dictionary mapping intersection points to lists of roads.
+        generator (np.random.Generator): Random number generator for reproducibility.
+        edges (list): List of boundary roads.
+        roads (list): List of all roads in the map.
+        __segments (list): List of road segments.
+        draw_d (dict): Dictionary for drawing segments by traffic state.
+        hmap (HMap): Real map object (if applicable).
+        __road_infor (Any): Information about roads in real map mode.
+        __intersection_l (list): List of intersection points.
+        hmap_updated (bool): Flag indicating if the real map has been updated.
+        distance_dict (dict): Dictionary of shortest distances between segment endpoints.
+    Methods:
+        __init__(rnum, max_v=5000, max_h=5000, busy=0, fromfile=0):
+            Initializes the Map object, generating roads and segments.
+        load_map():
+            Loads map configuration from a file and initializes roads.
+        make_map():
+            Generates a synthetic map with horizontal and vertical roads.
+        build():
+            Builds the map by finding intersections and segments, or loads a real map.
+        buid_distance_map():
+            Builds a dictionary of shortest distances between segment endpoints using Dijkstra's algorithm.
+        update_hmap():
+            Updates the real map's segments and intersections if not already updated.
+        save_map():
+            Saves the current map configuration to a file.
+        update_intersec_road():
+            Updates the intersection dictionary by finding intersections between all roads and edges.
+        get_intersections():
+            Returns the list of intersection points.
+        find_path():
+            Placeholder for a graph algorithm to find all possible routes between two points.
+        draw_map():
+            Draws the map using matplotlib, either synthetic or real map mode.
+        get_segments():
+            Returns the list of road segments.
+        draw_segments():
+            Draws the road segments with color coding based on traffic state.
+        check_valid_nxt_intersection(current_pnt, visited):
+            Returns the next valid intersection points for a vehicle, excluding visited points.
+        test_graph():
+            Tests the graph by finding possible routes between two intersection points using Dijkstra's algorithm.
+    """
     
-    '''
     # busy_status = ['None', "normal_time", "peak_time", "extem_crowed"]
     busy_ps =  [['1.0', "0.0", "0.0", "0.0","0.0"],
                 ['0.7', "0.2", "0.1", "0.0", "0.0"],#None busy

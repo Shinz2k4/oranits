@@ -5,10 +5,6 @@ sys.path.append(parent_dir)
 sys.path.append(os.path.dirname(parent_dir))
 
 from mappo.ddqn_trainer import DDQNTrainer
-from mappo.ppo_model import PolicyNormal
-from mappo.ppo_model import CriticNet
-from mappo.ppo_model import ActorNet
-from mappo.ppo_agent import PPOAgent
 from mappo.ddqn_agent import DDQNAgent
 import numpy as np
 import torch
@@ -19,7 +15,7 @@ from configs.systemcfg import log_configs, verbose, DEVICE, ddqn_cfg
 from configs.config import ParaConfig
 from utils import Load
 import sys
-from src.meta_heuristic.script_many_metaheuristics import eval_model
+from src.meta_heuristic.script_many_metaheuristics import eval_model, dual_eval
 
 device = torch.device('cuda:'+str(DEVICE) if torch.cuda.is_available() else 'cpu')
 
@@ -200,7 +196,7 @@ def eval_agents(env, trainer, n_episodes=100000, target_score=100000,
             trainer.print_status()
             trainer.plot()
 
-def eval_ddqn(num = 10):
+def eval_ddqn(num = 20):
     load = Load()
     graph, map_information =  load.get_infor()
     task_generator = TaskGenerator(1, map_information)
@@ -212,7 +208,7 @@ def eval_ddqn(num = 10):
     state_size = np.prod(env.observation_space.shape)
     action_size = env.action_space.shape[0] 
     # Initialize agents for training.
-    agents = [create_agent(state_size, action_size, agent_idx=i, load_from_file=True, ckpt_idx=100000) for i in range(num_agents)]
+    agents = [create_agent(state_size, action_size, agent_idx=i, load_from_file=True, ckpt_idx=80000) for i in range(num_agents)]
 
     # Create MAPPOTrainer object to train agents.
     save_dir = os.path.join(os.getcwd(), r'saved_files')
@@ -223,15 +219,15 @@ def eval_ddqn(num = 10):
                                 max_eps_length=config['n_miss_per_vec']
                                 )
     for i in range(num):
-        meta_algorithm = ParaConfig.models[0]
+        meta_algorithm = ParaConfig.models
         meta_config = copy.deepcopy(config)
         with open(f"{ParaConfig.EVAL_PATH_SAVE}/drl_meta_result_{i}.txt", "w") as file:
             original_stdout = sys.stdout
             sys.stdout = file
-            eval_agents(env, trainer, n_episodes=5*config['n_miss_per_vec'])
-        # eval_model(meta_algorithm, map_information, meta_config, cnt=i)
-        # _, _, config = env.reset_for_meta()
+            eval_agents(env, trainer, n_episodes=2*config['n_miss_per_vec'])
         sys.stdout = original_stdout
+        dual_eval(meta_algorithm, meta_config, cnt=i)
+        _, _, config = env.reset_for_meta()
 
 def ppo():
     raise NotImplemented()

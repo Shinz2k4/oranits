@@ -30,7 +30,6 @@ def calculate_edge_length(u, v, G):
     point_v = (G.nodes[v]['y'], G.nodes[v]['x'])
     return geodesic(point_u, point_v).meters
    
-    
 def merge_nodes(G, sdistance):
     # this work remove the nearest nodes, improve the performance of other algorithm during searching in map
     nodes_to_remove = [] 

@@ -1,4 +1,4 @@
-DEVICE = 5
+DEVICE = 0
 GLOBAL_SEED = 42
 
 log_configs = {
@@ -68,15 +68,15 @@ network_cfg = {
     "seed":42 
 }
 verbose = 0
-eval = True
+eval = False
 ddqn_cfg = {
     "discount_factor":0.95,
     "learning_rate": 1e-5,
     "epsilon": 1.0,
-    "epsilon_decay": 0.999,
+    "epsilon_decay": 0.99,
     "epsilon_min": 0.05,
     "batch_size": 512,
     "maxlen_mem": 10000000,
     "modify_reward": True,
-    "combine": 0.05
+    "combine": 0.00
 }
