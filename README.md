@@ -122,7 +122,7 @@ Accepted at **IEEE GLOBECOM 2025**, Communication QoS, Reliability and Modeling 
 ```bibtex
 @inproceedings{nguyen2025metaheuristic,
   title     = {A Metaheuristic Approach for Mission Assignment and Task Offloading in Open RAN-Enabled Intelligent Transport Systems},
-  author    = {Nguyen, Ngoc Hung and Nguyen, Van Thieu, Luu, Quang-Trung and Vo, Phi Son and Nguyen, Van-Dinh},
+  author    = {Nguyen, Ngoc Hung and Nguyen, Van Thieu and Luu, Quang-Trung and Vo, Phi Son and Nguyen, Van-Dinh},
   booktitle = {Proceedings of the IEEE Global Communications Conference (GLOBECOM)},
   year      = {2025},
   organization = {IEEE}
@@ -131,4 +131,4 @@ Accepted at **IEEE GLOBECOM 2025**, Communication QoS, Reliability and Modeling 
 
 ---
 
-📌 *Please cite one of the arXiv preprint or the GLOBECOM paper when using this code.*
+📌 *Please cite one of the arXiv preprints or the GLOBECOM paper when using this code.*
