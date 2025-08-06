@@ -90,3 +90,45 @@ All logs are automatically saved in the `logs/` folder, for example:
 This project uses the `scienceplots` package for publication-ready matplotlib styles.
 
 ---
+
+## 📚 Citation
+
+If you use this codebase in your research, please cite the following works:
+
+### 📄 1. arXiv Preprint
+
+**Oranits: Mission Assignment and Task Offloading in Open RAN-based ITS using Metaheuristic and Deep Reinforcement Learning**  
+Ngoc Hung Nguyen, Nguyen Van Thieu, Quang-Trung Luu, Anh Tuan Nguyen, Senura Wanasekara, Nguyen Cong Luong, Fatemeh Kavehmadavani, Van-Dinh Nguyen  
+arXiv: [2507.19712](https://arxiv.org/abs/2507.19712)
+
+```bibtex
+@article{nguyen2025oranits,
+  title     = {Oranits: Mission Assignment and Task Offloading in Open RAN-based ITS using Metaheuristic and Deep Reinforcement Learning},
+  author    = {Nguyen, Ngoc Hung and Thieu, Nguyen Van and Luu, Quang-Trung and Nguyen, Anh Tuan and Wanasekara, Senura and Luong, Nguyen Cong and Kavehmadavani, Fatemeh and Nguyen, Van-Dinh},
+  journal   = {arXiv preprint arXiv:2507.19712},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2507.19712}
+}
+```
+
+---
+
+### 📄 2. IEEE GLOBECOM 2025
+
+**A Metaheuristic Approach for Mission Assignment and Task Offloading in Open RAN-Enabled Intelligent Transport Systems**  
+Ngoc Hung Nguyen, Nguyen Van Thieu, Quang-Trung Luu, Vo Phi Son, Van-Dinh Nguyen  
+Accepted at **IEEE GLOBECOM 2025**, Communication QoS, Reliability and Modeling Symposium
+
+```bibtex
+@inproceedings{nguyen2025metaheuristic,
+  title     = {A Metaheuristic Approach for Mission Assignment and Task Offloading in Open RAN-Enabled Intelligent Transport Systems},
+  author    = {Nguyen, Ngoc Hung and Nguyen, Van Thieu, Luu, Quang-Trung and Vo, Phi Son and Nguyen, Van-Dinh},
+  booktitle = {Proceedings of the IEEE Global Communications Conference (GLOBECOM)},
+  year      = {2025},
+  organization = {IEEE}
+}
+```
+
+---
+
+📌 *Please cite one of the arXiv preprint or the GLOBECOM paper when using this code.*
