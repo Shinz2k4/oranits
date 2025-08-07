@@ -12,6 +12,8 @@ from src.meta_heuristic.script_statistic import get_statistic_results
 from src.meta_heuristic.script_visualize import draw_results, draw_eval_results, draw_compared_greedy_random_drl, csv_compared_greedy_random_meta
 import os, sys
 from configs.systemcfg import log_configs, DEVICE
+import io
+
 
 class Logger:
     def __init__(self, log_file):
@@ -20,7 +22,8 @@ class Logger:
 
     def write(self, message):
         self.terminal.write(message)
-        self.log.write(message)
+        # self.log.write(message)
+        self.log.write(message.encode('ascii', errors='ignore').decode())
 
     def flush(self):
         pass
@@ -43,6 +46,7 @@ timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
 log_filename = f"./logs/run_log_{timestamp}.log"
 logger = Logger(log_filename)
 sys.stdout = logger
+
 
 
 def parser_argument():
@@ -75,6 +79,7 @@ def main():
     
 if __name__ == "__main__":
     main()
-    
+
+
 sys.stdout.log.close()
         

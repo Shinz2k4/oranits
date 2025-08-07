@@ -7,7 +7,24 @@ else
 fi
 
 echo "Activating virtual environment..."
-source venv/bin/activate
+#!/bin/bash
+
+# Kích hoạt môi trường ảo Python phù hợp với từng hệ điều hành
+if [[ -f "venv/bin/activate" ]]; then
+    # Linux hoặc macOS
+    echo "Activating virtual environment (Linux/macOS)..."
+    source venv/bin/activate
+elif [[ -f "venv/Scripts/activate" ]]; then
+    # Windows (Git Bash)
+    echo "Activating virtual environment (Windows Git Bash)..."
+    ./venv/Scripts/activate
+else
+    echo "Could not find virtual environment activation script."
+    echo "Please ensure the venv is created."
+    exit 1
+fi
+
+
 
 echo "Upgrading pip..."
 pip install --upgrade pip

@@ -132,3 +132,58 @@ Accepted at **IEEE GLOBECOM 2025**, Communication QoS, Reliability and Modeling 
 ---
 
 📌 *Please cite one of the arXiv preprints or the GLOBECOM paper when using this code.*
+
+
+
+### How to setup environment in windows?  
+#### Step 1: Just copy and rewrite these lib with their's version to file requirements.txt 
+```
+attrs==24.2.0
+certifi==2024.8.30
+charset-normalizer==3.3.2
+cloudpickle==3.0.0
+colorama==0.4.6
+cycler==0.12.1
+Farama-Notifications==0.0.4
+filelock==3.16.1
+fonttools==4.53.1
+frozenlist==1.4.1
+fsspec==2024.9.0
+geographiclib==2.0
+idna==3.10
+kiwisolver==1.4.7
+llvmlite==0.43.0
+MarkupSafe==3.0.2
+mpmath==1.3.0
+msgpack==1.1.0
+networkx==3.2.1
+numpy==1.26.4
+nvidia-cusparse-cu12==12.1.0.106
+nvidia-nvjitlink-cu12==12.9.86
+packaging==24.1
+pillow==10.4.0
+protobuf==5.28.2
+pyparsing==3.1.4
+pytz==2024.2
+PyYAML==6.0.2
+rpds-py==0.20.0
+scipy==1.13.1
+shapely==2.0.6
+six==1.16.0
+sympy==1.13.3
+tensorboardX==2.6.2.2
+typing_extensions==4.12.2
+tzdata==2024.1
+urllib3==2.2.3
+zipp==3.23.0
+```
+
+#### Step 2: Run setup.sh to setup environment
+
+```
+sh setup.sh
+```
+
+#### Step 3: Continue simulation like above.
+
+
